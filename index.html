@@ -1,0 +1,1700 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<script>
+// Amplitude loads ONLY after cookie consent. The loader script auto-initializes on
+// load, so it must NOT be in the page until the user accepts — we inject it then.
+window.startAmplitude = function () {
+  if (window.__ampStarted) return; window.__ampStarted = true;
+  var s = document.createElement('script');
+  s.src = 'https://cdn.amplitude.com/script/05c55b62b6185d3ee7d127c78dff1d9d.js';
+  s.onload = function () {
+    window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
+    window.amplitude.add({name:'source-tag',type:'enrichment',execute:async(e)=>{e.event_properties={source:'landing',...e.event_properties};return e;}});
+    window.amplitude.init('05c55b62b6185d3ee7d127c78dff1d9d', {"fetchRemoteConfig":true,"autocapture":{"attribution":{"trackingMethod":["userProperty","eventProperty"]},"fileDownloads":true,"formInteractions":true,"pageViews":true,"sessions":true,"elementInteractions":true,"networkTracking":true,"webVitals":true,"frustrationInteractions":{"thrashedCursor":true,"errorClicks":true,"deadClicks":true,"rageClicks":true}}});
+  };
+  document.head.appendChild(s);
+};
+</script>
+<title>Normis — Compliance API for AI agents</title>
+<meta name="description" content="Compliance API for AI agents — real-time, rule-cited, auditable. One API call before every regulated action returns allowed or blocked, with the exact rule cited." />
+<link rel="canonical" href="https://normis.dev/" />
+
+<!-- Structured data: read by Google Knowledge Graph and AI answer engines -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Normis",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web-based / Cloud API",
+  "url": "https://normis.dev/",
+  "description": "Compliance API for AI agents — real-time, rule-cited, auditable. One API call before every regulated action returns allowed or blocked, with the exact rule cited.",
+  "publisher": { "@type": "Organization", "name": "Normis", "url": "https://normis.dev/" }
+}
+</script>
+
+<meta property="og:title" content="Normis — Compliance API for AI agents" />
+<meta property="og:description" content="Compliance API for AI agents — real-time, rule-cited, auditable." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://normis.dev/" />
+<meta property="og:site_name" content="Normis" />
+<meta property="og:image" content="https://normis.dev/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Normis — Compliance API for AI agents" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://normis.dev/og.png" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0b'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f25c30'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0b;
+    --bg-elev: #111114;
+    --bg-panel: #0e0e10;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --fg: #f4f3ef;
+    --muted: rgba(244,243,239,0.42);
+    --dim: rgba(244,243,239,0.62);
+    --accent: #f25c30;
+    --accent-2: #ff7a4d;
+    --accent-glow: rgba(242,92,48,0.18);
+    --arrow-col: 56px;
+  }
+  html { background: var(--bg); color: var(--fg); }
+  body {
+    font-family: 'Geist', -apple-system, system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    min-height: 100svh;
+    background:
+      radial-gradient(80% 50% at 50% 0%, rgba(242,92,48,0.06), transparent 70%),
+      var(--bg);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .mono { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+  a { color: inherit; text-decoration: none; }
+
+  /* layout shell */
+  .shell {
+    max-width: none;
+    width: 100%;
+    margin: 0 auto;
+    padding: clamp(16px, 2vw, 28px) clamp(20px, 5vw, 96px) clamp(20px, 3vw, 44px);
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(32px, 5vw, 64px);
+  }
+
+  /* top status */
+  .status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: clamp(12px, 1.5vw, 18px);
+    border-bottom: 1px solid var(--border);
+  }
+  .status .brand { color: var(--fg); letter-spacing: 0.14em; font-weight: 500; display: inline-flex; align-items: baseline; gap: 0; text-transform: none; }
+  .status .brand .brand-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-left: 3px;
+    align-self: flex-end;
+    margin-bottom: 2px;
+  }
+  .status .center { color: var(--dim); }
+  .status .right { display: inline-flex; align-items: center; gap: 10px; }
+  .status .dot-live {
+    width: 6px; height: 6px; border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .status .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    background: var(--accent);
+    color: #11070a;
+    border-radius: 2px;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 6px 24px -8px var(--accent-glow);
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .status .cta:hover { background: var(--accent-2); transform: translateY(-1px); }
+  .status .cta .arr { transition: transform 0.2s ease; }
+  .status .cta:hover .arr { transform: translateX(2px); }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+  @media (max-width: 640px) {
+    .status .center { display: none; }
+  }
+
+  /* hero */
+  .hero {
+    padding-top: clamp(8px, 3vw, 24px);
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+    gap: clamp(24px, 4vw, 64px);
+    align-items: stretch;
+  }
+  .hero-text { min-width: 0; display: flex; flex-direction: column; }
+  .hero-vis {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    align-self: stretch;
+    cursor: crosshair;
+  }
+  .hero-vis canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-vis { display: none; }
+  }
+  .hero h1 {
+    font-family: 'Geist', sans-serif;
+    font-weight: 500;
+    font-size: clamp(64px, 12vw, 240px);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    margin: 0;
+    color: var(--fg);
+    white-space: nowrap;
+  }
+  .hero h1 .dot {
+    display: inline-block;
+    width: 0.18em;
+    height: 0.18em;
+    border-radius: 50%;
+    background: var(--accent);
+    vertical-align: baseline;
+    margin-left: 0.04em;
+  }
+  .hero .tagline {
+    margin-top: clamp(20px, 3vw, 36px);
+    font-size: clamp(20px, 2.6vw, 34px);
+    line-height: 1.22;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    max-width: 22ch;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .hero .sub {
+    margin-top: clamp(18px, 2vw, 24px);
+    font-size: clamp(14px, 1.2vw, 16px);
+    color: var(--dim);
+    max-width: 56ch;
+    line-height: 1.55;
+  }
+
+  /* demo */
+  .demo {
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.012), transparent 50%), var(--bg-panel);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .demo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px clamp(16px, 2vw, 22px);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: rgba(255,255,255,0.015);
+  }
+  .demo-header .title { color: var(--dim); }
+  .demo-header .live { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); }
+  .demo-header .live .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 1.8s ease-in-out infinite; }
+
+  .demo-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--arrow-col) minmax(0, 1fr);
+    align-items: stretch;
+    min-height: 320px;
+  }
+  .panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px clamp(14px, 1.8vw, 22px);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .panel-head .label { color: var(--dim); }
+  .panel-head .meta { color: var(--muted); }
+  .panel-body {
+    padding: clamp(16px, 2vw, 24px) clamp(16px, 2vw, 24px) clamp(20px, 2.5vw, 28px);
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(12px, 1vw, 13.5px);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    flex: 1;
+    color: var(--dim);
+    min-height: 220px;
+  }
+  .panel.input .panel-body { color: rgba(244,243,239,0.78); }
+  .panel.output .panel-body { color: var(--dim); }
+
+  /* JSON syntax */
+  .json-key { color: var(--accent); }
+  .json-string { color: #d9d6ce; }
+  .json-punct { color: var(--muted); }
+  .json-comment { color: rgba(244,243,239,0.3); font-style: italic; }
+
+  .caret {
+    display: inline-block;
+    width: 7px;
+    height: 1.05em;
+    background: var(--accent);
+    margin-left: 2px;
+    vertical-align: -2px;
+    animation: blink 1s steps(2, end) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .arrow-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--arrow-col);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    background: rgba(255,255,255,0.012);
+    font-family: 'Geist Mono', monospace;
+    color: var(--muted);
+    font-size: 22px;
+  }
+  .arrow-col .arrow {
+    color: var(--accent);
+    animation: arrow-shift 2.4s ease-in-out infinite;
+  }
+  @keyframes arrow-shift {
+    0%, 100% { transform: translateX(-2px); opacity: 0.7; }
+    50% { transform: translateX(2px); opacity: 1; }
+  }
+
+  .demo-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px clamp(16px, 2vw, 22px);
+    border-top: 1px solid var(--border);
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: rgba(255,255,255,0.015);
+  }
+  .demo-footer .status-text { color: var(--dim); transition: color 0.3s ease; }
+  .demo-footer .status-text.done { color: var(--accent); }
+  .demo-footer .status-text.allowed { color: #6ee7a8; }
+  .demo-footer .status-text.blocked { color: var(--accent); }
+  .demo-footer .status-text.escalate { color: #f5c451; }
+
+  /* cookie consent */
+  .cookie-banner {
+    position: fixed; bottom: 16px; right: 16px; z-index: 100;
+    width: min(400px, calc(100vw - 32px));
+    background: var(--bg-elev); border: 1px solid var(--border-strong);
+    border-radius: 3px; padding: 16px;
+    box-shadow: 0 20px 50px -16px rgba(0,0,0,0.75);
+    font-family: 'Geist', sans-serif;
+  }
+  .cookie-banner[hidden] { display: none; }
+  .cookie-banner p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--dim); }
+  .cookie-banner a { color: var(--fg); text-decoration: underline; text-underline-offset: 2px; }
+  .cookie-banner a:hover { color: var(--accent); }
+  .cookie-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+  .cookie-btn {
+    min-width: 88px; padding: 7px 14px; font-size: 12px; font-weight: 500;
+    border-radius: 2px; cursor: pointer; text-align: center;
+    font-family: 'Geist', sans-serif;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .cookie-btn.ghost { background: transparent; border: 1px solid var(--border-strong); color: var(--dim); }
+  .cookie-btn.ghost:hover { border-color: var(--fg); color: var(--fg); }
+  .cookie-btn.primary { background: var(--accent); border: 1px solid var(--accent); color: #11070a; font-weight: 500; }
+  .cookie-btn.primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+  .demo-footer .legend { color: var(--muted); transition: color 0.3s ease; }
+  .json-bool-true { color: #6ee7a8; }
+  .json-bool-false { color: var(--accent); }
+
+  @media (max-width: 820px) {
+    .demo-grid { grid-template-columns: 1fr; }
+    .arrow-col {
+      width: 100%;
+      min-height: 44px;
+      border-left: none;
+      border-right: none;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+      transform: none;
+    }
+    .arrow-col .arrow {
+      display: inline-block;
+      transform: rotate(90deg);
+      animation: arrow-shift-v 2.4s ease-in-out infinite;
+    }
+    @keyframes arrow-shift-v {
+      0%, 100% { transform: rotate(90deg) translateX(-2px); opacity: 0.7; }
+      50% { transform: rotate(90deg) translateX(2px); opacity: 1; }
+    }
+    .panel-body { min-height: 180px; }
+  }
+
+  /* demo tabs */
+  .demo-block {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding-top: clamp(20px, 3vw, 32px);
+    border-top: 1px solid var(--border);
+  }
+  .demo-tabs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--arrow-col) minmax(0, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--bg-panel);
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+    margin-bottom: -1px; /* sit flush against the demo box */
+    position: relative;
+    z-index: 1;
+  }
+  .demo-tabs .tab-spacer {
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    background: rgba(255,255,255,0.012);
+    border-bottom: 1px solid var(--border);
+  }
+  .demo-tab {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    padding: 14px clamp(16px, 2vw, 22px);
+    text-align: left;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 10px;
+    min-width: 0;
+    font-family: 'Geist Mono', monospace;
+    transition: color 0.2s ease, background 0.2s ease;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .demo-tab:last-child { }
+  .demo-tab .num {
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .demo-tab .label {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .demo-tab .sub {
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .demo-tab:hover .label { color: var(--fg); }
+  .demo-tab:hover .num { color: var(--dim); }
+  .demo-tab.active {
+    background: var(--bg-panel);
+    border-bottom-color: transparent;
+  }
+  .demo-tab.active .num { color: var(--accent); }
+  .demo-tab.active .label { color: var(--fg); }
+  .demo-tab.active .sub { color: var(--dim); }
+  .demo-tab.active::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--accent);
+  }
+  .demo-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .demo[hidden] { display: none; }
+  /* keep both demos visually attached to the tabs (no rounded top) */
+  .demo { border-radius: 0 0 4px 4px; }
+  @media (max-width: 900px) {
+    .demo-tab .sub { display: none; }
+    .demo-tab { grid-template-columns: auto auto; }
+  }
+  @media (max-width: 640px) {
+    .demo-tabs { grid-template-columns: 1fr; }
+    .demo-tabs .tab-spacer { display: none; }
+    .demo-tab { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  /* contact (team + ctas merged) */
+  .contact { padding-top: clamp(20px, 3vw, 32px); border-top: 1px solid var(--border); display: grid; grid-template-columns: minmax(180px, 240px) 1fr; gap: clamp(24px, 4vw, 56px); }
+  .contact > .head .eyebrow {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .contact > .head .eyebrow .num { color: var(--accent); margin-right: 8px; }
+  .contact > .body { display: flex; flex-direction: column; gap: clamp(20px, 2.5vw, 32px); }
+  .contact .who-text {
+    margin: 0;
+    font-size: clamp(18px, 2.2vw, 26px);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    color: var(--fg);
+    text-wrap: balance;
+    max-width: 32ch;
+  }
+  .contact .who-text .em { color: var(--dim); }
+  .contact .who-text .accent { color: var(--accent); }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+  }
+  .contact-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: clamp(4px, 1vw, 8px);
+  }
+  @media (max-width: 720px) {
+    .contact { grid-template-columns: 1fr; }
+  }
+
+  /* problem chips */
+  .problem {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(18px, 2vw, 26px);
+    padding-top: clamp(8px, 1.5vw, 12px);
+  }
+  .problem .lede {
+    margin: 0;
+    font-size: clamp(22px, 3.4vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+    color: var(--fg);
+    text-wrap: balance;
+    max-width: 24ch;
+  }
+  .problem .lede .em { color: var(--dim); }
+  .problem .lede .ac { color: var(--accent); }
+  .problem .conds {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .problem .cond {
+    background: var(--bg-panel);
+    padding: 14px clamp(14px, 1.5vw, 18px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 78px;
+  }
+  .problem .cond .id {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .problem .cond .txt {
+    font-size: 13.5px;
+    line-height: 1.35;
+    color: var(--dim);
+  }
+
+  /* product capabilities strip */
+  .product {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .cap {
+    background: var(--bg-panel);
+    padding: clamp(18px, 2vw, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 152px;
+  }
+  .cap .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .cap .id {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .cap .badge {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid var(--border-strong);
+    color: var(--muted);
+    border-radius: 2px;
+  }
+  .cap .badge.live {
+    color: var(--accent);
+    border-color: rgba(242,92,48,0.4);
+    background: rgba(242,92,48,0.06);
+  }
+  .cap h4 {
+    margin: 0;
+    font-size: clamp(16px, 1.4vw, 19px);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+  }
+  .cap p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--dim);
+  }
+
+  /* narrative blocks (why now / why we win) */
+  .narrative {
+    display: grid;
+    grid-template-columns: minmax(180px, 240px) 1fr;
+    gap: clamp(24px, 4vw, 56px);
+    padding-top: clamp(20px, 3vw, 32px);
+    border-top: 1px solid var(--border);
+  }
+  .narrative .eyebrow {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .narrative .eyebrow .num { color: var(--accent); margin-right: 8px; }
+  .narrative .body { display: flex; flex-direction: column; gap: clamp(18px, 2vw, 24px); }
+  .narrative h2 {
+    margin: 0;
+    font-family: 'Geist', sans-serif;
+    font-weight: 500;
+    font-size: clamp(28px, 4.4vw, 56px);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .narrative h2 .em { color: var(--dim); }
+  .narrative h2 .ac { color: var(--accent); }
+
+  .narrative.full { grid-template-columns: 1fr; }
+
+  /* generation → execution shift */
+  .shift {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .shift .col { padding: clamp(16px, 1.8vw, 22px) clamp(18px, 2vw, 26px); display: flex; flex-direction: column; gap: 10px; }
+  .shift .col .tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .shift .col.now .tag { color: var(--accent); }
+  .shift .col h3 {
+    margin: 0;
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+  .shift .col ul {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12.5px;
+    color: var(--dim);
+  }
+  .shift .col ul li::before { content: "·  "; color: var(--muted); }
+  .shift .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 clamp(14px, 2vw, 24px);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    background: rgba(255,255,255,0.012);
+    font-family: 'Geist Mono', monospace;
+    font-size: 22px;
+    color: var(--accent);
+  }
+  @media (max-width: 720px) {
+    .narrative { grid-template-columns: 1fr; }
+    .shift { grid-template-columns: 1fr; }
+    .shift .arrow { padding: 8px 0; border-left: none; border-right: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  }
+
+  /* edge tiles */
+  .edges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .edge {
+    background: var(--bg-panel);
+    padding: clamp(18px, 2vw, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 132px;
+  }
+  .edge .id {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .edge h4 {
+    margin: 0;
+    font-size: clamp(15px, 1.3vw, 17px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+  .edge p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--dim);
+  }
+
+  /* CTA */  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .team-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: clamp(24px, 3vw, 40px);
+  }
+  .team-footer .founders {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(28px, 4vw, 56px);
+    flex: 0 1 auto;
+  }
+  .team-cta {
+    justify-content: flex-end;
+    flex: 0 1 auto;
+  }
+  @media (max-width: 640px) {
+    .team-footer { align-items: stretch; }
+    .team-cta { width: 100%; justify-content: stretch; }
+    .team-cta .btn { flex: 1; justify-content: space-between; }
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    font-family: 'Geist', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn .arr { font-family: 'Geist Mono', monospace; font-size: 14px; transition: transform 0.2s ease; }
+  .btn:hover .arr { transform: translateX(3px); }
+  .btn.primary {
+    background: var(--accent);
+    color: #11070a;
+    box-shadow: 0 8px 32px -8px var(--accent-glow);
+  }
+  .btn.primary:hover { background: var(--accent-2); }
+  .btn.ghost {
+    background: transparent;
+    color: var(--fg);
+    border-color: var(--border-strong);
+  }
+  .btn.ghost:hover { border-color: var(--fg); background: rgba(255,255,255,0.03); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* team */
+  .team {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(28px, 3.5vw, 44px);
+    padding-top: clamp(20px, 3vw, 32px);
+    border-top: 1px solid var(--border);
+  }
+  .who { display: flex; flex-direction: column; gap: 14px; }
+  .who .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .who-text {
+    margin: 0;
+    font-size: clamp(15px, 3.2vw, 30px);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    color: var(--fg);
+  }
+  .who-text .em {
+    color: var(--dim);
+  }
+  .who-text .em .accent { color: var(--accent); }
+  .who-text .br-desktop { display: inline; }
+
+  /* founders */
+  .founders {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+  }
+  .founder { display: flex; flex-direction: column; gap: 6px; }
+  .founder .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .founder a {
+    font-size: clamp(18px, 1.6vw, 22px);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: max-content;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .founder a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+  .founder a .ext {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  .founder a:hover .ext { color: var(--accent); transform: translate(2px, -2px); }
+
+  /* footer */
+  footer.bottom {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: clamp(20px, 3vw, 28px);
+    border-top: 1px solid var(--border);
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  footer.bottom a:hover { color: var(--fg); }
+  footer.bottom .right { display: inline-flex; gap: clamp(12px, 2vw, 24px); align-items: center; }
+
+  /* tiny screens */
+  @media (max-width: 480px) {
+    .hero h1 { font-size: clamp(60px, 18vw, 96px); }
+    .hero .tagline { font-size: 22px; }
+    .btn { width: 100%; justify-content: space-between; }
+    footer.bottom { flex-direction: column; align-items: flex-start; gap: 12px; font-size: 10px; letter-spacing: 0.06em; }
+    footer.bottom .right { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+
+  /* reduce motion */
+  @media (prefers-reduced-motion: reduce) {
+    .caret, .arrow, .dot-live, .demo-header .live .dot { animation: none !important; }
+  }
+
+  /* INSIDE block: 4 edges in one row, no header, flush with demo above */
+  .inside { display: block; }
+  .inside > .body { min-width: 0; }
+  .inside .edges {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @media (max-width: 820px) {
+    .inside .edges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 540px) {
+    .inside .edges { grid-template-columns: 1fr; }
+  }
+
+  /* ===== UNIFIED RESPONSIVE LAYER ===== */
+
+  /* tablet (≤ 1024px) */
+  @media (max-width: 1024px) {
+    .shell { gap: clamp(28px, 4vw, 48px); }
+  }
+
+  /* small tablet / large phone (≤ 768px) */
+  @media (max-width: 768px) {
+    .hero { padding-top: 4px; }
+    .hero h1 { font-size: clamp(64px, 16vw, 120px); line-height: 0.94; }
+    .hero .tagline { font-size: clamp(20px, 4.6vw, 28px); margin-top: 16px; max-width: 100%; }
+    .hero .sub { font-size: 14.5px; margin-top: 14px; }
+    .panel-body { font-size: 12px; line-height: 1.55; min-height: 180px; padding: 16px; }
+    .panel-head { font-size: 10px; padding: 10px 14px; }
+    .demo-footer { flex-wrap: wrap; gap: 6px 14px; padding: 10px 14px; }
+    .demo-footer .legend { font-size: 10px; }
+    .edge { min-height: auto; padding: 18px; gap: 8px; }
+    .edge h4 { font-size: 16px; }
+    .edge p { font-size: 13px; }
+  }
+
+  /* phone (≤ 560px) */
+  @media (max-width: 560px) {
+    .shell { padding: 14px 18px 24px; gap: 26px; }
+    .status { font-size: 10px; }
+    .hero h1 { font-size: clamp(56px, 18vw, 84px); }
+    .hero .tagline { font-size: 19px; line-height: 1.25; }
+    .hero .sub { font-size: 13.5px; line-height: 1.5; }
+    .demo-footer .status-text { font-size: 10.5px; }
+    .panel-body { padding: 14px; min-height: 160px; }
+    .team-footer { flex-direction: column; align-items: stretch; gap: 22px; }
+    .team-footer .founders { gap: 22px 36px; }
+    .team-cta { width: 100%; justify-content: stretch; }
+    .team-cta .btn { flex: 1; justify-content: space-between; }
+    .btn { padding: 13px 18px; font-size: 14.5px; }
+    footer.bottom { gap: 10px; }
+  }
+
+  /* tiny phone (≤ 380px) */
+  @media (max-width: 380px) {
+    .shell { padding: 12px 16px 20px; }
+    .hero h1 { font-size: 54px; letter-spacing: -0.04em; }
+    .hero .tagline { font-size: 18px; }
+    .hero .sub { font-size: 13px; }
+    .founder a { font-size: 16px; }
+    .panel-body { font-size: 11.5px; min-height: 140px; }
+  }
+
+  /* prevent horizontal scroll everywhere */
+  html, body { max-width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="status">
+    <span class="brand mono">Normis<span class="brand-dot" aria-hidden="true"></span></span>
+    <span class="center mono"></span>
+    <a class="cta" href="https://app.normis.dev/login?utm_source=landing&amp;utm_medium=cta&amp;utm_campaign=launch&amp;utm_content=header">Get started</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Normis<span class="dot" aria-hidden="true"></span></h1>
+      <p class="tagline">Compliance API for AI agents — real-time, rule-cited, auditable.</p>
+      <p class="sub">AI agents in regulated environments have <span style="color: var(--accent);">no compliance layer</span> — they guess. Normis is that layer: one API call before every regulated action returns <span style="color: var(--fg);">allowed</span> or <span style="color: var(--accent);">blocked</span>, with the exact rule cited.</p>
+    </div>
+    <div class="hero-vis" id="hero-vis" aria-hidden="true">
+      <canvas id="neural-canvas"></canvas>
+    </div>
+  </section>
+
+  <div class="demo-block">
+  <div class="demo-tabs" role="tablist" aria-label="Demo mode">
+    <button class="demo-tab" type="button" role="tab" aria-selected="false" aria-controls="demo-ingest" id="tab-ingest" data-demo="ingest">
+      <span class="mono num">01</span>
+      <span class="mono label">INGESTION</span>
+      <span class="mono sub">regulation → graph → queryable</span>
+    </button>
+    <div class="tab-spacer" aria-hidden="true"></div>
+    <button class="demo-tab active" type="button" role="tab" aria-selected="true" aria-controls="demo-api" id="tab-api" data-demo="api">
+      <span class="mono num">02</span>
+      <span class="mono label">API&nbsp;CALL</span>
+      <span class="mono sub">agent → normis.check → allowed&nbsp;/&nbsp;blocked</span>
+    </button>
+  </div>
+
+  <section class="demo" id="demo-api" data-demo="api" role="tabpanel" aria-labelledby="tab-api" aria-label="Live demo: agent action to compliance decision">
+    <div class="demo-grid">
+      <div class="panel input">
+        <div class="panel-head">
+          <span class="label">CALL</span>
+          <span class="meta">node</span>
+        </div>
+        <div class="panel-body" id="input-text"></div>
+      </div>
+      <div class="arrow-col"><span class="arrow">→</span></div>
+      <div class="panel output">
+        <div class="panel-head">
+          <span class="label">RESPONSE</span>
+          <span class="meta" id="latency-meta">&lt; 80 ms</span>
+        </div>
+        <div class="panel-body" id="output-json"></div>
+      </div>
+    </div>
+    <div class="demo-footer">
+      <span class="status-text mono" id="status-text">▸&nbsp;&nbsp;IDLE</span>
+      <span class="legend mono" id="legend-rule">us.ny.mt.transaction_limit</span>
+    </div>
+  </section>
+
+  <section class="demo" id="demo-ingest" data-demo="ingest" role="tabpanel" aria-labelledby="tab-ingest" aria-label="Live demo: regulation to structured rule" hidden>
+    <div class="demo-grid">
+      <div class="panel input">
+        <div class="panel-head">
+          <span class="label">REGULATION</span>
+          <span class="meta">.pdf</span>
+        </div>
+        <div class="panel-body" id="ing-input"></div>
+      </div>
+      <div class="arrow-col"><span class="arrow">→</span></div>
+      <div class="panel output">
+        <div class="panel-head">
+          <span class="label">RULE</span>
+          <span class="meta">.json</span>
+        </div>
+        <div class="panel-body" id="ing-output"></div>
+      </div>
+    </div>
+    <div class="demo-footer">
+      <span class="status-text mono" id="ing-status">▸&nbsp;&nbsp;IDLE</span>
+      <span class="legend mono">us.ny.bitlicense.required</span>
+    </div>
+  </section>
+  </div>
+  <section class="inside" aria-label="Inside Normis">
+    <div class="body">
+      <div class="edges">
+        <div class="edge">
+          <span class="id">EDGE_01 · GRAPH, NOT LLM</span>
+          <h4>Rules as structured logic</h4>
+          <p>Constraints the agent reasons against — not text search.</p>
+        </div>
+        <div class="edge">
+          <span class="id">EDGE_02 · AUDITABLE</span>
+          <h4>Every decision is structured JSON</h4>
+          <p>Allowed / blocked + rule ID, source, version, timestamp. Branchable, never free text.</p>
+        </div>
+        <div class="edge">
+          <span class="id">EDGE_03 · ALWAYS CURRENT</span>
+          <h4>Tracked across publishers</h4>
+          <p>Regulation changes — the graph updates.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="team" aria-label="Team">
+    <p class="who-text">
+      Two brothers. Product Engineers building Normis.<br class="br-desktop">
+      <span class="em">The next bottleneck for autonomous AI isn't intelligence<br class="br-desktop"> — it's <span class="accent">permission</span>.</span>
+    </p>
+    <div class="team-footer">
+      <div class="founders">
+        <div class="founder">
+          <span class="label">CO-FOUNDER</span>
+          <a href="https://linkedin.com/in/andreyli-e/" target="_blank" rel="noopener noreferrer">Andrey Li <span class="ext">↗</span></a>
+        </div>
+        <div class="founder">
+          <span class="label">CO-FOUNDER</span>
+          <a href="https://linkedin.com/in/danilli" target="_blank" rel="noopener noreferrer">Danil Li <span class="ext">↗</span></a>
+        </div>
+      </div>
+      <div class="cta team-cta">
+        <a class="btn primary" href="https://app.normis.dev/login?utm_source=landing&amp;utm_medium=cta&amp;utm_campaign=launch&amp;utm_content=hero">Try free <span class="arr">→</span></a>
+        <a class="btn ghost" href="https://drive.google.com/file/d/1oZC_ruSpPqackWHwmr5_sIeQXUjlY2kP/view?usp=sharing" target="_blank" rel="noopener noreferrer">View deck <span class="arr">↗</span></a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bottom">
+    <span style="text-transform: none;">© 2026&nbsp;&nbsp;normis.dev</span>
+    <span class="right">
+      <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+      <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+    </span>
+  </footer>
+
+</div>
+
+<script>
+(() => {
+  const inputEl = document.getElementById('input-text');
+  const outputEl = document.getElementById('output-json');
+  const statusEl = document.getElementById('status-text');
+  const legendEl = document.getElementById('legend-rule');
+  const latencyEl = document.getElementById('latency-meta');
+
+  // Three real /v1/check flows from the live platform (US-NY): allowed · blocked · escalate.
+  const scenarios = [
+    {
+      input:
+`// agent moves funds — gate before execution
+await normis.check({
+  caller: { agent_id: "agt_01jw3k" },
+  action: "transfer",
+  jurisdiction: { primary: "US-NY" },
+  subject: { type: "business", id: "cus_001" },
+  action_params: {
+    amount: 5000, counterparty_verified: true
+  },
+  idempotency_key: "txn-5001"
+});`,
+      decision: 'allowed',
+      rule: 'us.ny.mt.transaction_limit',
+      output:
+`<span class="json-punct">{</span>
+  <span class="json-key">"decision"</span><span class="json-punct">:</span> <span class="json-string">"allowed"</span><span class="json-punct">,</span>
+  <span class="json-key">"rules"</span><span class="json-punct">:</span> <span class="json-punct">[</span>
+    <span class="json-punct">{</span> <span class="json-key">"rule_id"</span><span class="json-punct">:</span> <span class="json-string">"us.fed.bsa.wire.transfer"</span><span class="json-punct">,</span> <span class="json-key">"source"</span><span class="json-punct">:</span> <span class="json-string">"31 CFR §1010.410"</span> <span class="json-punct">},</span>
+    <span class="json-punct">{</span> <span class="json-key">"rule_id"</span><span class="json-punct">:</span> <span class="json-string">"us.fed.bsa.ctr.threshold"</span><span class="json-punct">,</span> <span class="json-key">"source"</span><span class="json-punct">:</span> <span class="json-string">"31 CFR §1010.410(f)"</span> <span class="json-punct">},</span>
+    <span class="json-punct">{</span> <span class="json-key">"rule_id"</span><span class="json-punct">:</span> <span class="json-string">"us.ny.mt.transaction_limit"</span><span class="json-punct">,</span> <span class="json-key">"source"</span><span class="json-punct">:</span> <span class="json-string">"23 NYCRR §200.15"</span> <span class="json-punct">}</span>
+  <span class="json-punct">],</span>
+  <span class="json-key">"reason_code"</span><span class="json-punct">:</span> <span class="json-string">"approved"</span><span class="json-punct">,</span>
+  <span class="json-key">"latency_ms"</span><span class="json-punct">:</span> <span class="json-bool-true">14</span>
+<span class="json-punct">}</span>`,
+      latency: '14 ms',
+    },
+    {
+      input:
+`// agent onboards a NY virtual-currency business
+await normis.check({
+  caller: { agent_id: "agt_01jw3k" },
+  action: "onboard",
+  jurisdiction: { primary: "US-NY" },
+  subject: { type: "business", id: "cus_002" },
+  action_params: {
+    bitlicense_status: "missing"
+  },
+  idempotency_key: "onb-2002"
+});`,
+      decision: 'blocked',
+      rule: 'us.ny.bitlicense.required',
+      output:
+`<span class="json-punct">{</span>
+  <span class="json-key">"decision"</span><span class="json-punct">:</span> <span class="json-string">"blocked"</span><span class="json-punct">,</span>
+  <span class="json-key">"rules"</span><span class="json-punct">:</span> <span class="json-punct">[</span>
+    <span class="json-punct">{</span> <span class="json-key">"rule_id"</span><span class="json-punct">:</span> <span class="json-string">"us.ny.bitlicense.required"</span><span class="json-punct">,</span> <span class="json-key">"source"</span><span class="json-punct">:</span> <span class="json-string">"23 NYCRR §200.3"</span> <span class="json-punct">}</span>
+  <span class="json-punct">],</span>
+  <span class="json-key">"reason_code"</span><span class="json-punct">:</span> <span class="json-string">"license_required"</span><span class="json-punct">,</span>
+  <span class="json-key">"latency_ms"</span><span class="json-punct">:</span> <span class="json-bool-true">11</span>
+<span class="json-punct">}</span>`,
+      latency: '11 ms',
+    },
+    {
+      input:
+`// agent moves $12,500 — above the reporting line
+await normis.check({
+  caller: { agent_id: "agt_01jw3k" },
+  action: "transfer",
+  jurisdiction: { primary: "US-NY" },
+  subject: { type: "business", id: "cus_003" },
+  action_params: {
+    amount: 12500, counterparty_verified: true
+  },
+  idempotency_key: "txn-12500"
+});`,
+      decision: 'escalate',
+      rule: 'us.fed.bsa.ctr.threshold',
+      output:
+`<span class="json-punct">{</span>
+  <span class="json-key">"decision"</span><span class="json-punct">:</span> <span class="json-string">"escalate"</span><span class="json-punct">,</span>
+  <span class="json-key">"rules"</span><span class="json-punct">:</span> <span class="json-punct">[</span>
+    <span class="json-punct">{</span> <span class="json-key">"rule_id"</span><span class="json-punct">:</span> <span class="json-string">"us.fed.bsa.ctr.threshold"</span><span class="json-punct">,</span> <span class="json-key">"source"</span><span class="json-punct">:</span> <span class="json-string">"31 CFR §1010.410(f)"</span> <span class="json-punct">}</span>
+  <span class="json-punct">],</span>
+  <span class="json-key">"reason_code"</span><span class="json-punct">:</span> <span class="json-string">"ctr_review_required"</span><span class="json-punct">,</span>
+  <span class="json-key">"escalation"</span><span class="json-punct">:</span> <span class="json-punct">{</span>
+    <span class="json-key">"what_happened"</span><span class="json-punct">:</span> <span class="json-string">"$12,500 exceeds the $10,000 threshold"</span><span class="json-punct">,</span>
+    <span class="json-key">"to_approve"</span><span class="json-punct">:</span> <span class="json-string">"Confirm Travel Rule recordkeeping"</span>
+  <span class="json-punct">}</span>
+<span class="json-punct">}</span>`,
+      latency: '21 ms',
+    },
+  ];
+
+  const caret = '<span class="caret"></span>';
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const isHidden = (id) => {
+    const el = document.getElementById(id);
+    return !el || el.hasAttribute('hidden');
+  };
+
+  // Type plain text into element
+  async function typeText(el, text, speed = 14) {
+    el.innerHTML = '';
+    let cur = '';
+    for (let i = 0; i < text.length; i++) {
+      cur += text[i];
+      el.innerHTML = escapeHtml(cur) + caret;
+      // small randomization for natural rhythm
+      const delay = text[i] === '\n' ? speed * 4 : speed + Math.random() * 12;
+      await sleep(delay);
+    }
+    el.innerHTML = escapeHtml(cur);
+  }
+
+  // Type HTML with tags, character-by-character (visible chars only).
+  // We parse the HTML into a sequence of tokens: {text, openTags[], closeTags[]}
+  async function typeHTML(el, html, speed = 10) {
+    el.innerHTML = '';
+    // Build a list of {char, prefix, suffix} where prefix/suffix are tag strings inserted before/after that char.
+    const tokens = [];
+    let i = 0;
+    let pendingPrefix = '';
+    const openStack = [];
+    while (i < html.length) {
+      if (html[i] === '<') {
+        const end = html.indexOf('>', i);
+        const tag = html.slice(i, end + 1);
+        pendingPrefix += tag;
+        if (tag.startsWith('</')) {
+          openStack.pop();
+        } else if (!tag.endsWith('/>')) {
+          // opening tag
+          const tagName = tag.match(/^<\s*([a-zA-Z0-9]+)/)[1];
+          // class extraction
+          const cls = (tag.match(/class="([^"]*)"/) || [, ''])[1];
+          openStack.push({ tag: tagName, cls });
+        }
+        i = end + 1;
+      } else {
+        const ch = html[i];
+        tokens.push({
+          ch,
+          prefix: pendingPrefix,
+          // snapshot of currently open tags to wrap partial content
+          stack: openStack.slice(),
+        });
+        pendingPrefix = '';
+        i++;
+      }
+    }
+
+    // Render progressively. After last token we still need to flush trailing closing tags.
+    let built = '';
+    for (let k = 0; k < tokens.length; k++) {
+      const t = tokens[k];
+      built += t.prefix + t.ch;
+      // To display in-progress, append closing tags for currently open stack at the end.
+      let trailing = '';
+      for (let s = t.stack.length - 1; s >= 0; s--) {
+        trailing += `</${t.stack[s].tag}>`;
+      }
+      el.innerHTML = built + trailing + caret;
+      const isNewline = t.ch === '\n';
+      const delay = isNewline ? speed * 3 : speed + Math.random() * 8;
+      await sleep(delay);
+    }
+    // final flush — append any remaining html (closing tags after last char)
+    el.innerHTML = html;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function setStatus(text, cls = '') {
+    statusEl.textContent = text;
+    statusEl.classList.remove('done', 'allowed', 'blocked', 'escalate');
+    if (cls) statusEl.classList.add(cls);
+  }
+
+  async function runLoop() {
+    let i = 0;
+    while (true) {
+      while (isHidden('demo-api')) { await sleep(400); }
+      const sc = scenarios[i % scenarios.length];
+
+      // Reset
+      inputEl.innerHTML = '<span style="color: var(--muted);">▸ waiting for agent action…</span>';
+      outputEl.innerHTML = '<span style="color: var(--muted);">// awaiting check</span>';
+      latencyEl.textContent = '—';
+      legendEl.style.color = 'var(--muted)';
+      legendEl.textContent = sc.rule;
+      setStatus('▸  IDLE');
+      await sleep(900);
+
+      setStatus('▸  AGENT CALLING…');
+      await typeText(inputEl, sc.input, 12);
+      await sleep(380);
+
+      setStatus('▸  EVALUATING…');
+      outputEl.innerHTML = '<span style="color: var(--muted);">// resolving rule graph…</span>';
+      await sleep(620);
+
+      setStatus('▸  RESPONDING…');
+      latencyEl.textContent = sc.latency;
+      await typeHTML(outputEl, sc.output, 8);
+      await sleep(260);
+
+      if (sc.decision === 'allowed') {
+        setStatus('✓  ALLOWED', 'allowed');
+        legendEl.style.color = '#6ee7a8';
+      } else if (sc.decision === 'escalate') {
+        setStatus('⚠  ESCALATE', 'escalate');
+        legendEl.style.color = '#f5c451';
+      } else {
+        setStatus('✕  BLOCKED', 'blocked');
+        legendEl.style.color = 'var(--accent)';
+      }
+      await sleep(3400);
+      i++;
+    }
+  }
+
+  // Start when in view (avoid background CPU on long pages, though page is short)
+  runLoop();
+
+  // ---------- INGESTION DEMO (regulation → graph) ----------
+  const ingInput = document.getElementById('ing-input');
+  const ingOutput = document.getElementById('ing-output');
+  const ingStatus = document.getElementById('ing-status');
+
+  const ingInputText =
+`§ 200.3(a)
+
+No person shall, without a license,
+engage in any virtual currency
+business activity involving New York
+or a New York resident, except as
+otherwise provided in this Part…`;
+
+  const ingJsonHTML =
+`<span class="json-punct">{</span>
+  <span class="json-key">"rule_id"</span><span class="json-punct">:</span> <span class="json-string">"us.ny.bitlicense.required"</span><span class="json-punct">,</span>
+  <span class="json-key">"version"</span><span class="json-punct">:</span> <span class="json-string">"2015-06-24"</span><span class="json-punct">,</span>
+  <span class="json-key">"jurisdiction"</span><span class="json-punct">:</span> <span class="json-punct">[</span><span class="json-string">"US-NY"</span><span class="json-punct">],</span>
+  <span class="json-key">"actions"</span><span class="json-punct">:</span> <span class="json-punct">[</span><span class="json-string">"onboard"</span><span class="json-punct">],</span>
+  <span class="json-key">"requirement"</span><span class="json-punct">:</span> <span class="json-punct">[{</span> <span class="json-key">"field"</span><span class="json-punct">:</span> <span class="json-string">"bitlicense_status"</span><span class="json-punct">,</span> <span class="json-key">"op"</span><span class="json-punct">:</span> <span class="json-string">"=="</span><span class="json-punct">,</span> <span class="json-key">"value"</span><span class="json-punct">:</span> <span class="json-string">"active"</span> <span class="json-punct">}],</span>
+  <span class="json-key">"decision"</span><span class="json-punct">:</span> <span class="json-string">"blocked"</span><span class="json-punct">,</span>
+  <span class="json-key">"source"</span><span class="json-punct">:</span> <span class="json-string">"23 NYCRR §200.3"</span><span class="json-punct">,</span>
+  <span class="json-key">"signed_at"</span><span class="json-punct">:</span> <span class="json-bool-false">null</span>
+<span class="json-punct">}</span>`;
+
+  function setIngStatus(text, done = false) {
+    ingStatus.textContent = text;
+    ingStatus.classList.toggle('done', done);
+  }
+
+  async function runIngestLoop() {
+    while (true) {
+      while (isHidden('demo-ingest')) { await sleep(400); }
+      ingInput.innerHTML = '<span style="color: var(--muted);">▸ waiting for document…</span>';
+      ingOutput.innerHTML = '<span style="color: var(--muted);">// awaiting input</span>';
+      setIngStatus('▸  IDLE');
+      await sleep(900);
+
+      setIngStatus('▸  INGESTING…');
+      await typeText(ingInput, ingInputText, 14);
+      await sleep(500);
+
+      setIngStatus('▸  PARSING…');
+      ingOutput.innerHTML = '<span style="color: var(--muted);">// compiling rule graph…</span>';
+      await sleep(700);
+
+      setIngStatus('▸  STRUCTURING…');
+      await typeHTML(ingOutput, ingJsonHTML, 9);
+      await sleep(300);
+
+      setIngStatus('✓  STRUCTURED', true);
+      await sleep(3200);
+    }
+  }
+  runIngestLoop();
+
+  // ---------- TAB SWITCHER ----------
+  const tabs = document.querySelectorAll('.demo-tab');
+  const demos = {
+    api: document.getElementById('demo-api'),
+    ingest: document.getElementById('demo-ingest'),
+  };
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const key = tab.dataset.demo;
+      tabs.forEach(t => {
+        const active = t === tab;
+        t.classList.toggle('active', active);
+        t.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      Object.entries(demos).forEach(([k, el]) => {
+        if (!el) return;
+        if (k === key) el.removeAttribute('hidden');
+        else el.setAttribute('hidden', '');
+      });
+    });
+  });
+})();
+</script>
+
+<script>
+/* Hero neural-network visualization */
+(() => {
+  const canvas = document.getElementById('neural-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const ACCENT = [242, 92, 48];
+  const layerSizes = [4, 7, 7, 3];
+  let W = 0, H = 0, dpr = 1;
+  let nodes = [];
+  let nodesByLayer = [];
+  let edges = [];
+  const mouse = { x: -9999, y: -9999, inside: false };
+  let signals = [];
+  let running = true;
+  let visible = true;
+  let rafId = 0;
+  let prefersReduced = false;
+  try { prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = canvas.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    if (W < 4 || H < 4) return;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    layout();
+  }
+
+  function layout() {
+    nodes = [];
+    nodesByLayer = [];
+    edges = [];
+    const padX = Math.max(28, W * 0.10);
+    const padY = Math.max(22, H * 0.10);
+    for (let l = 0; l < layerSizes.length; l++) {
+      const count = layerSizes[l];
+      const x = padX + ((W - 2 * padX) * l) / (layerSizes.length - 1);
+      const layerArr = [];
+      for (let i = 0; i < count; i++) {
+        const y = count === 1 ? H / 2 : padY + ((H - 2 * padY) * i) / (count - 1);
+        const node = {
+          x, y, layer: l, idx: i,
+          a: 0, base: 0.03 + Math.random() * 0.04,
+          jitter: Math.random() * 1000,
+        };
+        nodes.push(node);
+        layerArr.push(node);
+      }
+      nodesByLayer.push(layerArr);
+    }
+    for (let l = 0; l < layerSizes.length - 1; l++) {
+      const from = nodesByLayer[l];
+      const to = nodesByLayer[l + 1];
+      for (const a of from) for (const b of to) edges.push({ from: a, to: b });
+    }
+  }
+
+  function fireSignal(startNode) {
+    const inputs = nodesByLayer[0];
+    if (!inputs || inputs.length === 0) return;
+    const start = startNode || inputs[Math.floor(Math.random() * inputs.length)];
+    signals.push({ t: 0, layer: 0, path: [start], strength: 0.85 + Math.random() * 0.15 });
+  }
+
+  let lastT = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - lastT) / 1000);
+    lastT = now;
+
+    const influence = Math.max(W, H) * 0.28;
+    const influenceSq = influence * influence;
+    for (const n of nodes) {
+      let act = 0;
+      if (mouse.inside) {
+        const dx = mouse.x - n.x, dy = mouse.y - n.y;
+        const dSq = dx * dx + dy * dy;
+        if (dSq < influenceSq) {
+          const d = Math.sqrt(dSq);
+          act = Math.pow(1 - d / influence, 1.6);
+        }
+      }
+      const amb = n.base + 0.025 * (0.5 + 0.5 * Math.sin(now * 0.0008 + n.jitter));
+      n.a = Math.max(n.a * 0.90, act, amb);
+    }
+
+    const stepTime = 0.32;
+    for (let i = signals.length - 1; i >= 0; i--) {
+      const sig = signals[i];
+      sig.t += dt;
+      const targetLayer = Math.floor(sig.t / stepTime);
+      if (targetLayer >= layerSizes.length) { signals.splice(i, 1); continue; }
+      while (sig.layer < targetLayer) {
+        sig.layer++;
+        const next = nodesByLayer[sig.layer];
+        const pick = next[Math.floor(Math.random() * next.length)];
+        if (pick) sig.path.push(pick);
+      }
+      const head = sig.path[sig.path.length - 1];
+      if (head) head.a = Math.max(head.a, sig.strength);
+      for (let k = 1; k < sig.path.length; k++) {
+        const a = sig.path[k - 1];
+        a.a = Math.max(a.a, sig.strength * (0.5 + 0.5 * (k / sig.path.length)));
+      }
+    }
+
+    ctx.clearRect(0, 0, W, H);
+
+    for (const e of edges) {
+      const ea = Math.min(1, e.from.a * 0.6 + e.to.a * 0.6);
+      const base = 0.05;
+      if (ea > 0.15) {
+        const alpha = Math.min(0.6, base + ea * 0.7);
+        ctx.strokeStyle = `rgba(${ACCENT[0]},${ACCENT[1]},${ACCENT[2]},${alpha})`;
+        ctx.lineWidth = 0.5 + ea * 0.9;
+      } else {
+        ctx.strokeStyle = `rgba(255,255,255,${base})`;
+        ctx.lineWidth = 0.5;
+      }
+      ctx.beginPath();
+      ctx.moveTo(e.from.x, e.from.y);
+      ctx.lineTo(e.to.x, e.to.y);
+      ctx.stroke();
+    }
+
+    for (const n of nodes) {
+      const r = 2.4 + n.a * 5.5;
+      if (n.a > 0.18) {
+        const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 3.2);
+        grd.addColorStop(0, `rgba(${ACCENT[0]},${ACCENT[1]},${ACCENT[2]},${Math.min(0.5, n.a * 0.55)})`);
+        grd.addColorStop(1, `rgba(${ACCENT[0]},${ACCENT[1]},${ACCENT[2]},0)`);
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r * 3.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      const t = Math.min(1, n.a * 1.2);
+      const rr = Math.round(t * ACCENT[0] + (1 - t) * 200);
+      const gg = Math.round(t * ACCENT[1] + (1 - t) * 200);
+      const bb = Math.round(t * ACCENT[2] + (1 - t) * 200);
+      ctx.fillStyle = `rgba(${rr},${gg},${bb},${0.35 + n.a * 0.65})`;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (running && visible && !prefersReduced) {
+      rafId = requestAnimationFrame(frame);
+    } else {
+      rafId = 0;
+    }
+  }
+
+  function start() {
+    if (rafId) return;
+    lastT = performance.now();
+    rafId = requestAnimationFrame(frame);
+  }
+
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+    mouse.inside = true;
+  });
+  canvas.addEventListener('mouseleave', () => { mouse.inside = false; });
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    let best = null, bestD = Infinity;
+    for (const n of nodesByLayer[0] || []) {
+      const d = (n.x - x) ** 2 + (n.y - y) ** 2;
+      if (d < bestD) { bestD = d; best = n; }
+    }
+    fireSignal(best);
+  });
+
+  let fireTimer = 0;
+  function scheduleFire() {
+    clearTimeout(fireTimer);
+    const delay = 1200 + Math.random() * 1800;
+    fireTimer = setTimeout(() => {
+      if (visible && running) fireSignal();
+      scheduleFire();
+    }, delay);
+  }
+
+  // pause when offscreen
+  if (typeof IntersectionObserver !== 'undefined') {
+    const io = new IntersectionObserver((entries) => {
+      visible = entries[0].isIntersecting;
+      if (visible && !prefersReduced) start();
+    }, { threshold: 0.01 });
+    io.observe(canvas);
+  }
+  // pause when tab hidden
+  document.addEventListener('visibilitychange', () => {
+    running = !document.hidden;
+    if (running && visible && !prefersReduced) start();
+  });
+
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+  } else {
+    window.addEventListener('resize', resize);
+  }
+  resize();
+  if (!prefersReduced) {
+    start();
+    scheduleFire();
+  } else {
+    requestAnimationFrame(() => { frame(performance.now()); });
+  }
+})();
+</script>
+
+<script>
+  // Named CTA conversions → app (source:'landing' added by the Amplitude enrichment plugin)
+  document.querySelectorAll('a[href*="app.normis.dev"]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      try {
+        var placement = new URL(a.href).searchParams.get('utm_content') || 'unknown';
+        var name = { header: 'get_started_clicked', hero: 'try_free_clicked', footer: 'open_app_clicked' }[placement] || 'cta_clicked';
+        window.amplitude && window.amplitude.track(name, { placement: placement });
+      } catch (e) {}
+    });
+  });
+</script>
+
+<div id="cookie-banner" class="cookie-banner" hidden role="dialog" aria-label="Cookie consent">
+  <p>We use cookies and analytics to understand usage and improve Normis. Read our <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</p>
+  <div class="cookie-actions">
+    <button type="button" id="cookie-reject" class="cookie-btn ghost">Reject</button>
+    <button type="button" id="cookie-accept" class="cookie-btn primary">Accept</button>
+  </div>
+</div>
+<script>
+(() => {
+  const KEY = 'normis_cookie_consent';
+  const el = document.getElementById('cookie-banner');
+  let consent = null;
+  try { consent = localStorage.getItem(KEY); } catch (e) {}
+  if (consent === 'accepted') { window.startAmplitude && window.startAmplitude(); }
+  else if (consent !== 'rejected') { el.hidden = false; } // no choice yet → ask, analytics stay off
+  const choose = (v) => {
+    try { localStorage.setItem(KEY, v); } catch (e) {}
+    el.hidden = true;
+    if (v === 'accepted') { window.startAmplitude && window.startAmplitude(); }
+  };
+  document.getElementById('cookie-accept').addEventListener('click', () => choose('accepted'));
+  document.getElementById('cookie-reject').addEventListener('click', () => choose('rejected'));
+})();
+</script>
+
+</body>
+</html>

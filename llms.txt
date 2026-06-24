@@ -1,0 +1,10 @@
+# Normis
+
+> Compliance API for AI agents — real-time, rule-cited, auditable. One API call before every regulated action returns allowed or blocked, with the exact rule cited.
+
+Normis is the compliance layer for AI agents in regulated environments. Instead of agents guessing, a single `normis.check()` call gates each regulated action and returns a decision with the exact rule citation, for an auditable trail.
+
+## Pages
+- [Home](https://normis.dev/): What Normis does, how the check API works.
+- [Privacy Policy](https://normis.dev/privacy.html)
+- [Terms](https://normis.dev/terms.html)
